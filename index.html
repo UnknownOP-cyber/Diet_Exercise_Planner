@@ -1,0 +1,2101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diet_Exercise_Planner</title>
+    <meta name="description" content="Diet_Exercise_Planner is your personal health assistant. Create custom diet plans, tailored workout routines, and track fitness goals with our free, responsive web app. Secure local storage keeps your data private. Start your transformation today with optimized meal plans and exercise schedules built for your unique lifestyle and fitness needs.">
+    <meta name="keywords" content="Diet_Exercise_Planner, personalized meal planner, custom workout generator, fitness tracker app, weight loss diet plan, muscle gain routine, BMI calculator, responsive health app, offline fitness tracker, web-based diet planner">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #2d6a4f;
+            --light-green: #d8f3dc;
+            --accent-green: #40916c;
+            --soft-blue: #e0f2f1;
+            --warm-white: #f8faf9;
+            --text-dark: #1b4332;
+            --text-muted: #6c757d;
+            --card-shadow: 0 4px 20px rgba(45, 106, 79, 0.08);
+            --hover-shadow: 0 8px 30px rgba(45, 106, 79, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f8faf9 0%, #e8f5e9 100%);
+            min-height: 100vh;
+            color: var(--text-dark);
+        }
+
+        /* Auth Section */
+        .auth-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 100%);
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 420px;
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-logo i {
+            font-size: 3rem;
+            color: var(--primary-green);
+        }
+
+        .auth-logo h2 {
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-top: 0.5rem;
+        }
+
+        .auth-logo p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: 12px;
+            border: 1.5px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 4px rgba(64, 145, 108, 0.1);
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(45, 106, 79, 0.3);
+            color: white;
+        }
+
+        .btn-outline-custom {
+            border: 2px solid var(--accent-green);
+            color: var(--accent-green);
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            background: transparent;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-outline-custom:hover {
+            background: var(--light-green);
+            color: var(--primary-green);
+        }
+
+        .auth-toggle {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .auth-toggle a {
+            color: var(--primary-green);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        /* Dashboard */
+        .dashboard-section {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+            padding-bottom: 3rem;
+        }
+
+        .dashboard-section.active {
+            display: block;
+        }
+
+        /* Navbar */
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+            padding: 0.75rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-green) !important;
+            font-size: 1.5rem;
+        }
+
+        .navbar-brand i {
+            margin-right: 0.5rem;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .btn-logout {
+            border: 1.5px solid #dc3545;
+            color: #dc3545;
+            border-radius: 10px;
+            padding: 0.4rem 1rem;
+            font-weight: 500;
+            font-size: 0.85rem;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-reset {
+            border: 1.5px solid var(--accent-green);
+            color: var(--accent-green);
+            border-radius: 10px;
+            padding: 0.4rem 1rem;
+            font-weight: 500;
+            font-size: 0.85rem;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .btn-reset:hover {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        /* Cards */
+        .dashboard-card {
+            background: white;
+            border-radius: 20px;
+            border: none;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .dashboard-card:hover {
+            box-shadow: var(--hover-shadow);
+            transform: translateY(-3px);
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--light-green) 0%, var(--soft-blue) 100%);
+            border-bottom: none;
+            padding: 1.25rem 1.5rem;
+            font-weight: 600;
+            color: var(--primary-green);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-header-custom i {
+            font-size: 1.2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--hover-shadow);
+            transform: translateY(-3px);
+        }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.bmi { background: #fff3e0; color: #e65100; }
+        .stat-icon.cal { background: #e3f2fd; color: #1565c0; }
+        .stat-icon.weight { background: #e8f5e9; color: #2e7d32; }
+        .stat-icon.goal { background: #f3e5f5; color: #7b1fa2; }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Progress */
+        .progress-custom {
+            height: 12px;
+            border-radius: 10px;
+            background: #e9ecef;
+            overflow: hidden;
+        }
+
+        .progress-bar-custom {
+            background: linear-gradient(90deg, var(--primary-green) 0%, var(--accent-green) 100%);
+            border-radius: 10px;
+            transition: width 1s ease;
+        }
+
+        /* Meal Cards */
+        .meal-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.25rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .meal-card:hover {
+            box-shadow: var(--hover-shadow);
+            transform: translateY(-2px);
+        }
+
+        .meal-type {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--accent-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .meal-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .meal-cal {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .meal-cal i {
+            color: #e65100;
+            margin-right: 0.25rem;
+        }
+
+        /* Exercise Table */
+        .exercise-table {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .exercise-table thead th {
+            background: linear-gradient(135deg, var(--light-green) 0%, var(--soft-blue) 100%);
+            color: var(--primary-green);
+            font-weight: 600;
+            border: none;
+            padding: 1rem;
+        }
+
+        .exercise-table tbody td {
+            padding: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
+        }
+
+        .exercise-table tbody tr:hover {
+            background: #f8faf9;
+        }
+
+        .badge-exercise {
+            background: var(--light-green);
+            color: var(--primary-green);
+            font-weight: 500;
+            padding: 0.4rem 0.75rem;
+            border-radius: 8px;
+        }
+
+        /* Tracker */
+        .tracker-input-group {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .log-entry {
+            background: #f8faf9;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .log-entry-date {
+            font-weight: 600;
+            color: var(--primary-green);
+        }
+
+        .log-entry-details {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Motivational Banner */
+        .motivation-banner {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .motivation-banner h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .motivation-banner p {
+            margin: 0;
+            opacity: 0.95;
+        }
+
+        /* Wizard */
+        .wizard-step {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .wizard-step.active {
+            display: block;
+        }
+
+        .wizard-progress {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .wizard-progress::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: #e9ecef;
+            z-index: 0;
+        }
+
+        .wizard-step-indicator {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e9ecef;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .wizard-step-indicator.active {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .wizard-step-indicator.completed {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        .wizard-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        .modal-content {
+            border-radius: 24px;
+            border: none;
+        }
+
+        .modal-header {
+            border-bottom: none;
+            padding: 1.5rem 1.5rem 0;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            border-top: none;
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        /* Day selector for meal plan */
+        .day-tabs {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .day-tab {
+            min-width: 50px;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            border: 1.5px solid #e9ecef;
+            background: white;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .day-tab.active {
+            background: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+        }
+
+        .day-tab:hover:not(.active) {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        /* Week selector */
+        .week-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .week-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            border: 1.5px solid #e9ecef;
+            background: white;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .week-btn.active {
+            background: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+        }
+
+        /* Streak badge */
+        .streak-badge {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Hydration reminder */
+        .hydration-card {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 16px;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .hydration-icon {
+            font-size: 2rem;
+            color: #1565c0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .auth-card {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            .stat-card {
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-green);
+            border-radius: 4px;
+        }
+
+        /* Alert custom */
+        .alert-custom {
+            border-radius: 12px;
+            border: none;
+        }
+
+        /* Section title */
+        .section-title {
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title i {
+            font-size: 1.5rem;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #dee2e6;
+        }
+
+        /* Checkbox custom for workout completion */
+        .workout-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 2px solid var(--accent-green);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .workout-check.completed {
+            background: var(--accent-green);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-custom fixed-top" id="mainNav" style="display: none;">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="bi bi-heart-pulse-fill"></i>Diet_Exercise_Planner</a>
+            <div class="nav-user">
+                <span id="navUserName" style="font-weight: 500; color: var(--text-dark);"></span>
+                <div class="user-avatar" id="userAvatar"></div>
+                <button class="btn-reset" onclick="resetPlan()"><i class="bi bi-arrow-counterclockwise"></i> New Plan</button>
+                <button class="btn-logout" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Auth Section -->
+    <section class="auth-section" id="authSection">
+        <div class="auth-card" id="authCard">
+            <div class="auth-logo">
+                <i class="bi bi-heart-pulse-fill"></i>
+                <h2>Diet_Exercise_Planner</h2>
+                <p>Your Personal Diet & Exercise Planner</p>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm">
+                <h5 class="mb-3 text-center" style="color: var(--text-dark);">Welcome Back</h5>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="loginEmail" placeholder="Enter your email">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="loginPassword" placeholder="Enter your password">
+                </div>
+                <div id="loginError" class="alert alert-danger alert-custom mb-3" style="display: none;"></div>
+                <button class="btn-primary-custom mb-2" onclick="login()">Sign In</button>
+                <div class="auth-toggle">
+                    Don't have an account? <a onclick="toggleAuth()">Register</a>
+                </div>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" style="display: none;">
+                <h5 class="mb-3 text-center" style="color: var(--text-dark);">Create Account</h5>
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="regName" placeholder="Your full name">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="regEmail" placeholder="Enter your email">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="regPassword" placeholder="Create a password (min 6 chars)">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="regConfirm" placeholder="Confirm password">
+                </div>
+                <div id="regError" class="alert alert-danger alert-custom mb-3" style="display: none;"></div>
+                <div id="regSuccess" class="alert alert-success alert-custom mb-3" style="display: none;"></div>
+                <button class="btn-primary-custom mb-2" onclick="register()">Create Account</button>
+                <div class="auth-toggle">
+                    Already have an account? <a onclick="toggleAuth()">Sign In</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Section -->
+    <section class="dashboard-section" id="dashboardSection">
+        <div style="height: 76px;"></div> <!-- Spacer for fixed nav -->
+        <div class="container py-4">
+
+            <!-- Motivation Banner -->
+            <div class="motivation-banner" id="motivationBanner">
+                <h4 id="motivationTitle">Let's crush your goals!</h4>
+                <p id="motivationText">Every step forward is progress. Keep going!</p>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="section-title">
+                <i class="bi bi-speedometer2"></i>
+                Your Health Summary
+            </div>
+            <div class="row mb-4">
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon bmi"><i class="bi bi-clipboard-data"></i></div>
+                        <div class="stat-value" id="bmiValue">--</div>
+                        <div class="stat-label">BMI Score</div>
+                        <div class="small mt-1" id="bmiCategory" style="color: var(--accent-green); font-weight: 500;">--</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon cal"><i class="bi bi-lightning-charge"></i></div>
+                        <div class="stat-value" id="calorieValue">--</div>
+                        <div class="stat-label">Daily Calories</div>
+                        <div class="small mt-1" style="color: var(--text-muted);">kcal/day</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon weight"><i class="bi bi-speedometer"></i></div>
+                        <div class="stat-value" id="currentWeightDisplay">--</div>
+                        <div class="stat-label">Current Weight</div>
+                        <div class="small mt-1" id="weightProgressText" style="color: var(--accent-green); font-weight: 500;">--</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon goal"><i class="bi bi-bullseye"></i></div>
+                        <div class="stat-value" id="goalDisplay">--</div>
+                        <div class="stat-label">Goal</div>
+                        <div class="small mt-1" id="streakDisplay" style="color: var(--accent-green); font-weight: 500;">-- day streak</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weight Progress -->
+            <div class="dashboard-card mb-4">
+                <div class="card-header-custom">
+                    <i class="bi bi-graph-up-arrow"></i>
+                    Progress to Target Weight
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span id="progressStartLabel">Start: -- kg</span>
+                        <span id="progressTargetLabel">Target: -- kg</span>
+                    </div>
+                    <div class="progress-custom mb-3">
+                        <div class="progress-bar-custom" id="weightProgressBar" style="width: 0%"></div>
+                    </div>
+                    <p class="mb-0" style="color: var(--text-muted); font-size: 0.9rem;">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Log your daily weight below to track progress.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Diet Plan Section -->
+            <div class="section-title">
+                <i class="bi bi-cup-hot"></i>
+                Your Personalized Meal Plan
+            </div>
+            <div class="dashboard-card mb-4">
+                <div class="card-header-custom">
+                    <i class="bi bi-calendar-week"></i>
+                    <span id="dietPlanTitle">1-Month Meal Plan</span>
+                </div>
+                <div class="card-body p-4">
+                    <div class="day-tabs" id="dayTabs"></div>
+                    <div id="mealPlanContent"></div>
+                    <div class="hydration-card mt-3">
+                        <div class="hydration-icon"><i class="bi bi-droplet-fill"></i></div>
+                        <div>
+                            <div style="font-weight: 600; color: #1565c0;">Hydration Reminder</div>
+                            <div style="font-size: 0.9rem; color: #424242;">Aim for <strong id="waterTarget">2.5L</strong> of water daily. Drink before meals and stay hydrated during workouts.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise Plan Section -->
+            <div class="section-title">
+                <i class="bi bi-bicycle"></i>
+                Your Workout Schedule
+            </div>
+            <div class="dashboard-card mb-4">
+                <div class="card-header-custom">
+                    <i class="bi bi-calendar-check"></i>
+                    Weekly Exercise Plan
+                </div>
+                <div class="card-body p-4">
+                    <div class="week-selector" id="weekSelector"></div>
+                    <div id="exercisePlanContent"></div>
+                </div>
+            </div>
+
+            <!-- Goal Tracker -->
+            <div class="section-title">
+                <i class="bi bi-journal-check"></i>
+                Daily Goal Tracker
+            </div>
+            <div class="dashboard-card mb-4">
+                <div class="card-header-custom">
+                    <i class="bi bi-pencil-square"></i>
+                    Log Your Progress
+                </div>
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Today's Weight (kg)</label>
+                            <input type="number" class="form-control" id="logWeight" step="0.1" placeholder="e.g., 70.5">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Calories Consumed</label>
+                            <input type="number" class="form-control" id="logCalories" placeholder="e.g., 1800">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Minutes Exercised</label>
+                            <input type="number" class="form-control" id="logMinutes" placeholder="e.g., 45">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Did you complete today's workout?</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="workoutCompleted">
+                                <label class="form-check-label" for="workoutCompleted">Workout Completed</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="dietFollowed">
+                                <label class="form-check-label" for="dietFollowed">Followed Meal Plan</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-primary-custom" style="width: auto; padding: 0.75rem 2rem;" onclick="addLogEntry()">
+                        <i class="bi bi-plus-lg me-2"></i>Log Entry
+                    </button>
+                    <div id="trackerMessage" class="mt-3" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- Log History -->
+            <div class="dashboard-card mb-4">
+                <div class="card-header-custom">
+                    <i class="bi bi-clock-history"></i>
+                    Recent Logs
+                </div>
+                <div class="card-body p-4" id="logHistory">
+                    <div class="empty-state">
+                        <i class="bi bi-journal"></i>
+                        <p>No entries yet. Start logging your progress today!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Onboarding Modal -->
+    <div class="modal fade" id="onboardingModal" data-bs-backdrop="static" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" style="color: var(--primary-green); font-weight: 700;">
+                        <i class="bi bi-person-plus me-2"></i>Set Up Your Profile
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <!-- Wizard Progress -->
+                    <div class="wizard-progress">
+                        <div class="text-center">
+                            <div class="wizard-step-indicator active" id="step1ind">1</div>
+                            <div class="wizard-label">Basic Info</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="wizard-step-indicator" id="step2ind">2</div>
+                            <div class="wizard-label">Body Stats</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="wizard-step-indicator" id="step3ind">3</div>
+                            <div class="wizard-label">Activity</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="wizard-step-indicator" id="step4ind">4</div>
+                            <div class="wizard-label">Diet</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="wizard-step-indicator" id="step5ind">5</div>
+                            <div class="wizard-label">Goals</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 1: Basic Info -->
+                    <div class="wizard-step active" id="step1">
+                        <h6 class="mb-3" style="color: var(--text-dark);">Tell us about yourself</h6>
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="profName" placeholder="e.g., John Doe">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Gender</label>
+                            <select class="form-select" id="profGender">
+                                <option value="">Select gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Age (years)</label>
+                            <input type="number" class="form-control" id="profAge" placeholder="e.g., 28" min="10" max="100">
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Body Stats -->
+                    <div class="wizard-step" id="step2">
+                        <h6 class="mb-3" style="color: var(--text-dark);">Your body measurements</h6>
+                        <div class="mb-3">
+                            <label class="form-label">Current Weight (kg)</label>
+                            <input type="number" class="form-control" id="profWeight" step="0.1" placeholder="e.g., 75.0">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Height (cm)</label>
+                            <input type="number" class="form-control" id="profHeight" placeholder="e.g., 175">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Target Weight (kg)</label>
+                            <input type="number" class="form-control" id="profTarget" step="0.1" placeholder="e.g., 68.0">
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Activity -->
+                    <div class="wizard-step" id="step3">
+                        <h6 class="mb-3" style="color: var(--text-dark);">How active are you?</h6>
+                        <div class="mb-3">
+                            <label class="form-label">Activity Level</label>
+                            <select class="form-select" id="profActivity">
+                                <option value="">Select activity level</option>
+                                <option value="sedentary">Sedentary (little or no exercise)</option>
+                                <option value="light">Lightly Active (1-3 days/week)</option>
+                                <option value="moderate">Moderately Active (3-5 days/week)</option>
+                                <option value="very">Very Active (6-7 days/week)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Exercise Environment</label>
+                            <select class="form-select" id="profEnvironment">
+                                <option value="">Select environment</option>
+                                <option value="home">Home</option>
+                                <option value="gym">Gym</option>
+                                <option value="none">No Equipment / Outdoor</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Diet -->
+                    <div class="wizard-step" id="step4">
+                        <h6 class="mb-3" style="color: var(--text-dark);">Your dietary preferences</h6>
+                        <div class="mb-3">
+                            <label class="form-label">Dietary Preference</label>
+                            <select class="form-select" id="profDiet">
+                                <option value="">Select preference</option>
+                                <option value="vegetarian">Vegetarian</option>
+                                <option value="non-vegetarian">Non-Vegetarian</option>
+                                <option value="vegan">Vegan</option>
+                                <option value="keto">Keto</option>
+                                <option value="no-preference">No Preference</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Allergies or Health Conditions</label>
+                            <textarea class="form-control" id="profAllergies" rows="3" placeholder="e.g., Nut allergy, lactose intolerant, diabetes..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Goals -->
+                    <div class="wizard-step" id="step5">
+                        <h6 class="mb-3" style="color: var(--text-dark);">What is your primary goal?</h6>
+                        <div class="mb-3">
+                            <label class="form-label">Fitness Goal</label>
+                            <select class="form-select" id="profGoal">
+                                <option value="">Select goal</option>
+                                <option value="weight-loss">Weight Loss</option>
+                                <option value="muscle-gain">Muscle Gain</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="endurance">Endurance</option>
+                                <option value="flexibility">Flexibility</option>
+                            </select>
+                        </div>
+                        <div class="alert alert-info alert-custom" style="background: var(--soft-blue); color: var(--primary-green); border: none;">
+                            <i class="bi bi-info-circle me-2"></i>
+                            We'll generate a personalized 1-month meal plan and weekly workout schedule based on your answers.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-outline-custom" id="prevBtn" style="width: auto; display: none;" onclick="prevStep()">Back</button>
+                    <button type="button" class="btn-primary-custom" id="nextBtn" style="width: auto;" onclick="nextStep()">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ============================
+        // DATA & STATE
+        // ============================
+        let currentUser = null;
+        let currentProfile = null;
+        let currentLogs = [];
+        let currentStep = 1;
+
+        // Activity multipliers
+        const activityMultipliers = {
+            sedentary: 1.2,
+            light: 1.375,
+            moderate: 1.55,
+            very: 1.725
+        };
+
+        // ============================
+        // AUTH SYSTEM
+        // ============================
+        function toggleAuth() {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            if (loginForm.style.display === 'none') {
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+            }
+            clearErrors();
+        }
+
+        function clearErrors() {
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('regError').style.display = 'none';
+            document.getElementById('regSuccess').style.display = 'none';
+        }
+
+        function getUsers() {
+            const users = localStorage.getItem('vitalfit_users');
+            return users ? JSON.parse(users) : {};
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem('vitalfit_users', JSON.stringify(users));
+        }
+
+        function register() {
+            clearErrors();
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim().toLowerCase();
+            const password = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regConfirm').value;
+
+            if (!name || !email || !password || !confirm) {
+                showRegError('Please fill in all fields.');
+                return;
+            }
+            if (password.length < 6) {
+                showRegError('Password must be at least 6 characters.');
+                return;
+            }
+            if (password !== confirm) {
+                showRegError('Passwords do not match.');
+                return;
+            }
+
+            const users = getUsers();
+            if (users[email]) {
+                showRegError('An account with this email already exists.');
+                return;
+            }
+
+            users[email] = {
+                name: name,
+                email: email,
+                password: password
+            };
+            saveUsers(users);
+
+            const successDiv = document.getElementById('regSuccess');
+            successDiv.textContent = 'Account created! Please sign in.';
+            successDiv.style.display = 'block';
+
+            setTimeout(() => {
+                toggleAuth();
+            }, 1500);
+        }
+
+        function showRegError(msg) {
+            const errDiv = document.getElementById('regError');
+            errDiv.textContent = msg;
+            errDiv.style.display = 'block';
+        }
+
+        function login() {
+            clearErrors();
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showLoginError('Please enter email and password.');
+                return;
+            }
+
+            const users = getUsers();
+            if (!users[email] || users[email].password !== password) {
+                showLoginError('Invalid email or password.');
+                return;
+            }
+
+            currentUser = users[email];
+            localStorage.setItem('vitalfit_current_user', JSON.stringify(currentUser));
+            showDashboard();
+        }
+
+        function showLoginError(msg) {
+            const errDiv = document.getElementById('loginError');
+            errDiv.textContent = msg;
+            errDiv.style.display = 'block';
+        }
+
+        function logout() {
+            currentUser = null;
+            currentProfile = null;
+            currentLogs = [];
+            localStorage.removeItem('vitalfit_current_user');
+            location.reload();
+        }
+
+        function checkAuth() {
+            const saved = localStorage.getItem('vitalfit_current_user');
+            if (saved) {
+                currentUser = JSON.parse(saved);
+                showDashboard();
+            }
+        }
+
+        // ============================
+        // DASHBOARD DISPLAY
+        // ============================
+        function showDashboard() {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('mainNav').style.display = 'flex';
+            document.getElementById('dashboardSection').classList.add('active');
+
+            document.getElementById('navUserName').textContent = currentUser.name;
+            document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+
+            loadProfile();
+            if (!currentProfile) {
+                const modal = new bootstrap.Modal(document.getElementById('onboardingModal'));
+                modal.show();
+            } else {
+                renderDashboard();
+            }
+        }
+
+        // ============================
+        // ONBOARDING WIZARD
+        // ============================
+        function nextStep() {
+            if (!validateStep(currentStep)) return;
+
+            if (currentStep < 5) {
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                document.getElementById(`step${currentStep}ind`).classList.remove('active');
+                document.getElementById(`step${currentStep}ind`).classList.add('completed');
+                currentStep++;
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                document.getElementById(`step${currentStep}ind`).classList.add('active');
+
+                document.getElementById('prevBtn').style.display = 'inline-block';
+                if (currentStep === 5) {
+                    document.getElementById('nextBtn').textContent = 'Generate My Plan';
+                }
+            } else {
+                saveProfile();
+                bootstrap.Modal.getInstance(document.getElementById('onboardingModal')).hide();
+                renderDashboard();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                document.getElementById(`step${currentStep}ind`).classList.remove('active');
+                currentStep--;
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                document.getElementById(`step${currentStep}ind`).classList.remove('completed');
+                document.getElementById(`step${currentStep}ind`).classList.add('active');
+
+                document.getElementById('nextBtn').textContent = 'Next';
+                if (currentStep === 1) {
+                    document.getElementById('prevBtn').style.display = 'none';
+                }
+            }
+        }
+
+        function validateStep(step) {
+            if (step === 1) {
+                if (!document.getElementById('profName').value.trim()) { alert('Please enter your name.'); return false; }
+                if (!document.getElementById('profGender').value) { alert('Please select gender.'); return false; }
+                if (!document.getElementById('profAge').value || document.getElementById('profAge').value < 10) { alert('Please enter a valid age.'); return false; }
+            }
+            if (step === 2) {
+                if (!document.getElementById('profWeight').value) { alert('Please enter current weight.'); return false; }
+                if (!document.getElementById('profHeight').value) { alert('Please enter height.'); return false; }
+                if (!document.getElementById('profTarget').value) { alert('Please enter target weight.'); return false; }
+            }
+            if (step === 3) {
+                if (!document.getElementById('profActivity').value) { alert('Please select activity level.'); return false; }
+                if (!document.getElementById('profEnvironment').value) { alert('Please select exercise environment.'); return false; }
+            }
+            if (step === 4) {
+                if (!document.getElementById('profDiet').value) { alert('Please select dietary preference.'); return false; }
+            }
+            if (step === 5) {
+                if (!document.getElementById('profGoal').value) { alert('Please select a fitness goal.'); return false; }
+            }
+            return true;
+        }
+
+        function saveProfile() {
+            currentProfile = {
+                name: document.getElementById('profName').value.trim(),
+                gender: document.getElementById('profGender').value,
+                age: parseInt(document.getElementById('profAge').value),
+                weight: parseFloat(document.getElementById('profWeight').value),
+                height: parseFloat(document.getElementById('profHeight').value),
+                targetWeight: parseFloat(document.getElementById('profTarget').value),
+                activity: document.getElementById('profActivity').value,
+                environment: document.getElementById('profEnvironment').value,
+                diet: document.getElementById('profDiet').value,
+                allergies: document.getElementById('profAllergies').value.trim(),
+                goal: document.getElementById('profGoal').value
+            };
+            const profiles = JSON.parse(localStorage.getItem('vitalfit_profiles') || '{}');
+            profiles[currentUser.email] = currentProfile;
+            localStorage.setItem('vitalfit_profiles', JSON.stringify(profiles));
+            currentLogs = [];
+            saveLogs();
+        }
+
+        function loadProfile() {
+            const profiles = JSON.parse(localStorage.getItem('vitalfit_profiles') || '{}');
+            if (profiles[currentUser.email]) {
+                currentProfile = profiles[currentUser.email];
+                loadLogs();
+            }
+        }
+
+        function saveLogs() {
+            const allLogs = JSON.parse(localStorage.getItem('vitalfit_logs') || '{}');
+            allLogs[currentUser.email] = currentLogs;
+            localStorage.setItem('vitalfit_logs', JSON.stringify(allLogs));
+        }
+
+        function loadLogs() {
+            const allLogs = JSON.parse(localStorage.getItem('vitalfit_logs') || '{}');
+            currentLogs = allLogs[currentUser.email] || [];
+        }
+
+        function resetPlan() {
+            if (confirm('Are you sure you want to reset your plan? This will clear your profile and logs.')) {
+                const profiles = JSON.parse(localStorage.getItem('vitalfit_profiles') || '{}');
+                delete profiles[currentUser.email];
+                localStorage.setItem('vitalfit_profiles', JSON.stringify(profiles));
+
+                const allLogs = JSON.parse(localStorage.getItem('vitalfit_logs') || '{}');
+                delete allLogs[currentUser.email];
+                localStorage.setItem('vitalfit_logs', JSON.stringify(allLogs));
+
+                currentProfile = null;
+                currentLogs = [];
+                currentStep = 1;
+
+                // Reset wizard UI
+                for (let i = 1; i <= 5; i++) {
+                    document.getElementById(`step${i}`).classList.remove('active');
+                    document.getElementById(`step${i}ind`).classList.remove('active', 'completed');
+                }
+                document.getElementById('step1').classList.add('active');
+                document.getElementById('step1ind').classList.add('active');
+                document.getElementById('prevBtn').style.display = 'none';
+                document.getElementById('nextBtn').textContent = 'Next';
+
+                // Clear form fields
+                document.getElementById('profName').value = '';
+                document.getElementById('profGender').value = '';
+                document.getElementById('profAge').value = '';
+                document.getElementById('profWeight').value = '';
+                document.getElementById('profHeight').value = '';
+                document.getElementById('profTarget').value = '';
+                document.getElementById('profActivity').value = '';
+                document.getElementById('profEnvironment').value = '';
+                document.getElementById('profDiet').value = '';
+                document.getElementById('profAllergies').value = '';
+                document.getElementById('profGoal').value = '';
+
+                const modal = new bootstrap.Modal(document.getElementById('onboardingModal'));
+                modal.show();
+            }
+        }
+
+        // ============================
+        // CALCULATIONS
+        // ============================
+        function calculateBMI(weight, heightCm) {
+            const heightM = heightCm / 100;
+            return (weight / (heightM * heightM)).toFixed(1);
+        }
+
+        function getBMICategory(bmi) {
+            if (bmi < 18.5) return 'Underweight';
+            if (bmi < 25) return 'Healthy Weight';
+            if (bmi < 30) return 'Overweight';
+            return 'Obese';
+        }
+
+        function calculateBMR(profile) {
+            const { gender, weight, height, age } = profile;
+            if (gender === 'male') {
+                return (10 * weight) + (6.25 * height) - (5 * age) + 5;
+            } else {
+                return (10 * weight) + (6.25 * height) - (5 * age) - 161;
+            }
+        }
+
+        function calculateTDEE(profile) {
+            const bmr = calculateBMR(profile);
+            return Math.round(bmr * activityMultipliers[profile.activity]);
+        }
+
+        function getCalorieTarget(profile) {
+            const tdee = calculateTDEE(profile);
+            switch (profile.goal) {
+                case 'weight-loss': return Math.round(tdee - 500);
+                case 'muscle-gain': return Math.round(tdee + 300);
+                case 'maintenance': return tdee;
+                case 'endurance': return Math.round(tdee + 200);
+                case 'flexibility': return Math.round(tdee - 200);
+                default: return tdee;
+            }
+        }
+
+        // ============================
+        // DASHBOARD RENDERING
+        // ============================
+        function renderDashboard() {
+            if (!currentProfile) return;
+
+            const bmi = calculateBMI(currentProfile.weight, currentProfile.height);
+            const bmiCategory = getBMICategory(parseFloat(bmi));
+            const calorieTarget = getCalorieTarget(currentProfile);
+            const waterTarget = currentProfile.weight > 80 ? '3.0L' : (currentProfile.weight > 60 ? '2.5L' : '2.0L');
+
+            // Update summary
+            document.getElementById('bmiValue').textContent = bmi;
+            document.getElementById('bmiCategory').textContent = bmiCategory;
+            document.getElementById('calorieValue').textContent = calorieTarget;
+            document.getElementById('currentWeightDisplay').textContent = currentProfile.weight + ' kg';
+            document.getElementById('goalDisplay').textContent = currentProfile.goal.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            document.getElementById('waterTarget').textContent = waterTarget;
+
+            // Weight progress
+            const startWeight = currentProfile.weight;
+            const targetWeight = currentProfile.targetWeight;
+            const totalDiff = Math.abs(startWeight - targetWeight);
+            let progress = 0;
+            if (currentLogs.length > 0) {
+                const latestWeight = currentLogs[currentLogs.length - 1].weight || startWeight;
+                const lostOrGained = Math.abs(startWeight - latestWeight);
+                progress = totalDiff > 0 ? Math.min(100, Math.round((lostOrGained / totalDiff) * 100)) : 0;
+            }
+
+            const weightDiff = (startWeight - targetWeight).toFixed(1);
+            const direction = weightDiff > 0 ? 'lose' : 'gain';
+            document.getElementById('weightProgressText').textContent = `Need to ${direction} ${Math.abs(weightDiff)} kg`;
+            document.getElementById('progressStartLabel').textContent = `Start: ${startWeight} kg`;
+            document.getElementById('progressTargetLabel').textContent = `Target: ${targetWeight} kg`;
+            document.getElementById('weightProgressBar').style.width = `${progress}%`;
+
+            // Streak
+            const streak = calculateStreak();
+            document.getElementById('streakDisplay').textContent = `${streak} day streak`;
+
+            // Motivation
+            updateMotivation(streak);
+
+            // Render plans
+            renderDayTabs();
+            renderMealPlan(1);
+            renderWeekSelector();
+            renderExercisePlan(1);
+            renderLogHistory();
+        }
+
+        function calculateStreak() {
+            if (currentLogs.length === 0) return 0;
+            let streak = 0;
+            const today = new Date();
+            for (let i = 0; i < currentLogs.length; i++) {
+                const logDate = new Date(currentLogs[currentLogs.length - 1 - i].date);
+                const diffDays = Math.floor((today - logDate) / (1000 * 60 * 60 * 24));
+                if (diffDays === i && currentLogs[currentLogs.length - 1 - i].workout) {
+                    streak++;
+                } else if (diffDays !== i) {
+                    break;
+                }
+            }
+            return streak;
+        }
+
+        function updateMotivation(streak) {
+            const messages = [
+                { title: "Let's crush your goals!", text: "Every step forward is progress. Keep going!" },
+                { title: "You're on fire!", text: "One day down, a lifetime of health to go." },
+                { title: "Streak mode activated!", text: "Consistency is the key to transformation." },
+                { title: "Unstoppable!", text: "Your dedication is inspiring. Keep pushing!" },
+                { title: "Legendary status!", text: "You're building habits that last a lifetime." }
+            ];
+            const msg = messages[Math.min(streak, messages.length - 1)];
+            document.getElementById('motivationTitle').textContent = msg.title;
+            document.getElementById('motivationText').textContent = msg.text;
+        }
+
+        // ============================
+        // MEAL PLAN
+        // ============================
+        const mealDatabase = {
+            vegetarian: {
+                breakfast: [
+                    { name: "Oatmeal with berries and almonds", cal: 350 },
+                    { name: "Greek yogurt parfait with granola", cal: 300 },
+                    { name: "Avocado toast with poached egg", cal: 400 },
+                    { name: "Spinach and feta omelette", cal: 380 },
+                    { name: "Smoothie bowl with chia seeds", cal: 320 },
+                    { name: "Whole grain toast with peanut butter", cal: 340 },
+                    { name: "Paneer bhurji with multigrain toast", cal: 420 }
+                ],
+                lunch: [
+                    { name: "Grilled vegetable quinoa bowl", cal: 450 },
+                    { name: "Lentil soup with whole wheat bread", cal: 400 },
+                    { name: "Chickpea curry with brown rice", cal: 500 },
+                    { name: "Caprese salad with balsamic glaze", cal: 350 },
+                    { name: "Vegetable stir-fry with tofu", cal: 420 },
+                    { name: "Spinach dal with roti", cal: 480 },
+                    { name: "Mushroom risotto", cal: 460 }
+                ],
+                dinner: [
+                    { name: "Baked sweet potato with black beans", cal: 400 },
+                    { name: "Vegetable lasagna", cal: 450 },
+                    { name: "Palak paneer with jeera rice", cal: 520 },
+                    { name: "Zucchini noodles with pesto", cal: 320 },
+                    { name: "Stuffed bell peppers with quinoa", cal: 380 },
+                    { name: "Miso soup with edamame", cal: 300 },
+                    { name: "Eggplant parmesan with salad", cal: 420 }
+                ],
+                snack: [
+                    { name: "Apple slices with almond butter", cal: 200 },
+                    { name: "Mixed nuts (30g)", cal: 180 },
+                    { name: "Carrot sticks with hummus", cal: 150 },
+                    { name: "Roasted chickpeas", cal: 160 },
+                    { name: "Fruit salad cup", cal: 120 },
+                    { name: "Cottage cheese with cucumber", cal: 140 },
+                    { name: "Energy balls (2)", cal: 170 }
+                ]
+            },
+            'non-vegetarian': {
+                breakfast: [
+                    { name: "Scrambled eggs with spinach", cal: 380 },
+                    { name: "Chicken sausage with toast", cal: 420 },
+                    { name: "Smoked salmon on whole grain bagel", cal: 450 },
+                    { name: "Egg and avocado toast", cal: 400 },
+                    { name: "Turkey bacon with omelette", cal: 380 },
+                    { name: "Protein pancakes with syrup", cal: 440 },
+                    { name: "Boiled eggs with fruit", cal: 320 }
+                ],
+                lunch: [
+                    { name: "Grilled chicken breast with quinoa", cal: 500 },
+                    { name: "Salmon fillet with roasted vegetables", cal: 550 },
+                    { name: "Turkey wrap with whole wheat tortilla", cal: 480 },
+                    { name: "Chicken tikka with mint chutney", cal: 460 },
+                    { name: "Tuna salad with olive oil dressing", cal: 420 },
+                    { name: "Beef stir-fry with broccoli", cal: 520 },
+                    { name: "Chicken biryani (light oil)", cal: 580 }
+                ],
+                dinner: [
+                    { name: "Baked cod with asparagus", cal: 380 },
+                    { name: "Chicken fajita bowl", cal: 450 },
+                    { name: "Grilled prawns with garlic butter", cal: 400 },
+                    { name: "Lamb chops with mint sauce", cal: 520 },
+                    { name: "Chicken soup with vegetables", cal: 340 },
+                    { name: "Fish curry with brown rice", cal: 480 },
+                    { name: "Egg curry with chapati", cal: 440 }
+                ],
+                snack: [
+                    { name: "Boiled eggs (2)", cal: 160 },
+                    { name: "Chicken strips with mustard", cal: 200 },
+                    { name: "Tuna on whole grain crackers", cal: 180 },
+                    { name: "Turkey roll-ups with cheese", cal: 170 },
+                    { name: "Salmon sashimi (4 pieces)", cal: 190 },
+                    { name: "Protein shake", cal: 160 },
+                    { name: "Jerky (beef/turkey)", cal: 150 }
+                ]
+            },
+            vegan: {
+                breakfast: [
+                    { name: "Chia pudding with coconut milk", cal: 320 },
+                    { name: "Tofu scramble with vegetables", cal: 350 },
+                    { name: "Overnight oats with flaxseed", cal: 340 },
+                    { name: "Banana pancakes (vegan)", cal: 380 },
+                    { name: "Fruit smoothie with protein powder", cal: 300 },
+                    { name: "Avocado toast with hemp seeds", cal: 360 },
+                    { name: "Breakfast burrito with black beans", cal: 400 }
+                ],
+                lunch: [
+                    { name: "Buddha bowl with tahini dressing", cal: 480 },
+                    { name: "Lentil Bolognese with pasta", cal: 450 },
+                    { name: "Jackfruit curry with rice", cal: 460 },
+                    { name: "Falafel wrap with hummus", cal: 520 },
+                    { name: "Thai vegetable curry with coconut", cal: 440 },
+                    { name: "Quinoa salad with roasted veggies", cal: 400 },
+                    { name: "Tofu tikka masala", cal: 480 }
+                ],
+                dinner: [
+                    { name: "Stuffed sweet potatoes with beans", cal: 420 },
+                    { name: "Cauliflower steak with chimichurri", cal: 350 },
+                    { name: "Veggie burger with side salad", cal: 460 },
+                    { name: "Zucchini lasagna with cashew cheese", cal: 380 },
+                    { name: "Mushroom stroganoff", cal: 400 },
+                    { name: "Tempeh stir-fry with brown rice", cal: 450 },
+                    { name: "Vegetable sushi rolls with edamame", cal: 360 }
+                ],
+                snack: [
+                    { name: "Apple with almond butter", cal: 200 },
+                    { name: "Roasted chickpeas", cal: 160 },
+                    { name: "Vegan protein bar", cal: 180 },
+                    { name: "Rice cakes with avocado", cal: 150 },
+                    { name: "Trail mix (nuts & dried fruit)", cal: 190 },
+                    { name: "Hummus with veggie sticks", cal: 140 },
+                    { name: "Frozen banana nice cream", cal: 130 }
+                ]
+            },
+            keto: {
+                breakfast: [
+                    { name: "Bacon and eggs with avocado", cal: 520 },
+                    { name: "Keto smoothie with MCT oil", cal: 480 },
+                    { name: "Cheese and spinach frittata", cal: 460 },
+                    { name: "Sausage and egg muffins", cal: 440 },
+                    { name: "Avocado with smoked salmon", cal: 500 },
+                    { name: "Bulletproof coffee with butter", cal: 350 },
+                    { name: "Cream cheese pancakes", cal: 420 }
+                ],
+                lunch: [
+                    { name: "Caesar salad with grilled chicken", cal: 520 },
+                    { name: "Zucchini noodles with pesto and chicken", cal: 480 },
+                    { name: "Beef burger without bun", cal: 550 },
+                    { name: "Tuna salad with olive oil mayo", cal: 460 },
+                    { name: "Creamy mushroom soup", cal: 400 },
+                    { name: "Egg salad with lettuce wraps", cal: 440 },
+                    { name: "Steak with garlic butter", cal: 580 }
+                ],
+                dinner: [
+                    { name: "Baked salmon with asparagus", cal: 480 },
+                    { name: "Chicken thighs with cauliflower mash", cal: 520 },
+                    { name: "Shrimp scampi with zucchini", cal: 460 },
+                    { name: "Pork chops with green beans", cal: 500 },
+                    { name: "Stuffed mushrooms with cheese", cal: 380 },
+                    { name: "Lamb curry with coconut cream", cal: 540 },
+                    { name: "Crispy tofu with sesame cabbage", cal: 420 }
+                ],
+                snack: [
+                    { name: "Macadamia nuts (30g)", cal: 220 },
+                    { name: "Cheese cubes with olives", cal: 190 },
+                    { name: "Boiled eggs (2)", cal: 160 },
+                    { name: "Pepperoni slices", cal: 180 },
+                    { name: "Celery with almond butter", cal: 170 },
+                    { name: "Keto fat bombs (2)", cal: 200 },
+                    { name: "Avocado half with salt", cal: 150 }
+                ]
+            },
+            'no-preference': {
+                breakfast: [
+                    { name: "Scrambled eggs with whole wheat toast", cal: 380 },
+                    { name: "Oatmeal with banana and honey", cal: 360 },
+                    { name: "Greek yogurt with mixed berries", cal: 320 },
+                    { name: "Avocado toast with poached egg", cal: 400 },
+                    { name: "Smoothie with protein powder", cal: 340 },
+                    { name: "Pancakes with fresh fruit", cal: 420 },
+                    { name: "Breakfast burrito with egg and beans", cal: 460 }
+                ],
+                lunch: [
+                    { name: "Grilled chicken salad with vinaigrette", cal: 460 },
+                    { name: "Quinoa bowl with roasted vegetables", cal: 440 },
+                    { name: "Turkey sandwich on whole grain", cal: 480 },
+                    { name: "Salmon poke bowl", cal: 520 },
+                    { name: "Vegetable soup with whole grain bread", cal: 380 },
+                    { name: "Chicken tikka with brown rice", cal: 500 },
+                    { name: "Pasta primavera with parmesan", cal: 450 }
+                ],
+                dinner: [
+                    { name: "Baked chicken with sweet potato", cal: 480 },
+                    { name: "Grilled fish with steamed vegetables", cal: 420 },
+                    { name: "Stir-fry tofu with brown rice", cal: 440 },
+                    { name: "Beef tacos with salsa", cal: 460 },
+                    { name: "Lentil curry with chapati", cal: 420 },
+                    { name: "Eggplant parmesan with salad", cal: 400 },
+                    { name: "Shrimp pasta with garlic oil", cal: 480 }
+                ],
+                snack: [
+                    { name: "Apple with peanut butter", cal: 200 },
+                    { name: "Mixed nuts (30g)", cal: 180 },
+                    { name: "Hummus with carrot sticks", cal: 150 },
+                    { name: "Protein shake", cal: 160 },
+                    { name: "Rice cakes with cottage cheese", cal: 140 },
+                    { name: "Dark chocolate square", cal: 130 },
+                    { name: "Fruit smoothie cup", cal: 170 }
+                ]
+            }
+        };
+
+        function renderDayTabs() {
+            const container = document.getElementById('dayTabs');
+            container.innerHTML = '';
+            for (let i = 1; i <= 30; i++) {
+                const tab = document.createElement('button');
+                tab.className = `day-tab ${i === 1 ? 'active' : ''}`;
+                tab.textContent = `D${i}`;
+                tab.onclick = () => {
+                    document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    renderMealPlan(i);
+                };
+                container.appendChild(tab);
+            }
+        }
+
+        function renderMealPlan(day) {
+            const diet = currentProfile.diet;
+            const meals = mealDatabase[diet] || mealDatabase['no-preference'];
+            const totalDays = 7; // Cycle every 7 days
+            const idx = (day - 1) % totalDays;
+
+            const calorieTarget = getCalorieTarget(currentProfile);
+            const goal = currentProfile.goal;
+
+            let portions = '';
+            if (goal === 'weight-loss') portions = 'Standard portions, prioritize vegetables';
+            else if (goal === 'muscle-gain') portions = 'Large portions, extra protein';
+            else if (goal === 'endurance') portions = 'Moderate-large portions, extra carbs';
+            else if (goal === 'flexibility') portions = 'Standard portions, anti-inflammatory foods';
+            else portions = 'Balanced portions';
+
+            const html = `
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="meal-card">
+                            <div class="meal-type">Breakfast</div>
+                            <div class="meal-title">${meals.breakfast[idx].name}</div>
+                            <div class="meal-cal"><i class="bi bi-fire"></i>${meals.breakfast[idx].cal} kcal</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="meal-card">
+                            <div class="meal-type">Lunch</div>
+                            <div class="meal-title">${meals.lunch[idx].name}</div>
+                            <div class="meal-cal"><i class="bi bi-fire"></i>${meals.lunch[idx].cal} kcal</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="meal-card">
+                            <div class="meal-type">Dinner</div>
+                            <div class="meal-title">${meals.dinner[idx].name}</div>
+                            <div class="meal-cal"><i class="bi bi-fire"></i>${meals.dinner[idx].cal} kcal</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="meal-card">
+                            <div class="meal-type">Snack</div>
+                            <div class="meal-title">${meals.snack[idx].name}</div>
+                            <div class="meal-cal"><i class="bi bi-fire"></i>${meals.snack[idx].cal} kcal</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3 p-3" style="background: #f8faf9; border-radius: 12px;">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <strong style="color: var(--primary-green);">Daily Target: ${calorieTarget} kcal</strong>
+                            <div class="small" style="color: var(--text-muted);">${portions}</div>
+                        </div>
+                        <div class="streak-badge">
+                            <i class="bi bi-calendar-check"></i>
+                            Day ${day} of 30
+                        </div>
+                    </div>
+                    ${currentProfile.allergies ? `<div class="mt-2 small" style="color: #dc3545;"><i class="bi bi-exclamation-triangle me-1"></i> Avoid: ${currentProfile.allergies}</div>` : ''}
+                </div>
+            `;
+            document.getElementById('mealPlanContent').innerHTML = html;
+        }
+
+        // ============================
+        // EXERCISE PLAN
+        // ============================
+        const exercisePlans = {
+            home: {
+                'weight-loss': [
+                    { day: 'Monday', focus: 'Full Body HIIT', exercises: 'Jumping jacks, burpees, mountain climbers, high knees | 3 rounds x 45 sec each' },
+                    { day: 'Tuesday', focus: 'Active Recovery', exercises: 'Brisk walking or light jog | 30-45 minutes' },
+                    { day: 'Wednesday', focus: 'Strength Circuit', exercises: 'Push-ups, squats, lunges, planks | 3 rounds x 15 reps' },
+                    { day: 'Thursday', focus: 'Cardio Blast', exercises: 'Jump rope, stair climbing, shadow boxing | 30 minutes' },
+                    { day: 'Friday', focus: 'Core & Abs', exercises: 'Crunches, leg raises, Russian twists, plank holds | 3 rounds' },
+                    { day: 'Saturday', focus: 'Full Body HIIT', exercises: 'Burpees, squat jumps, plank jacks, skaters | 3 rounds x 40 sec' },
+                    { day: 'Sunday', focus: 'Rest / Yoga', exercises: 'Stretching, yoga flow, meditation | 20-30 minutes' }
+                ],
+                'muscle-gain': [
+                    { day: 'Monday', focus: 'Upper Body Push', exercises: 'Push-ups, pike push-ups, tricep dips, wall handstand | 4 rounds x 12 reps' },
+                    { day: 'Tuesday', focus: 'Lower Body', exercises: 'Squats, Bulgarian splits, glute bridges, calf raises | 4 rounds x 15 reps' },
+                    { day: 'Wednesday', focus: 'Active Recovery', exercises: 'Light cardio, stretching | 20-30 minutes' },
+                    { day: 'Thursday', focus: 'Upper Body Pull', exercises: 'Door rows, Superman holds, reverse snow angels, bicep curls (water bottles) | 4 rounds' },
+                    { day: 'Friday', focus: 'Legs & Core', exercises: 'Lunges, side lunges, pistol squats (assisted), hanging leg raises | 4 rounds' },
+                    { day: 'Saturday', focus: 'Full Body Strength', exercises: 'Burpees, bear crawls, inchworms, pull-ups (if bar available) | 3 rounds' },
+                    { day: 'Sunday', focus: 'Rest / Mobility', exercises: 'Foam rolling, stretching, yoga | 30 minutes' }
+                ],
+                'maintenance': [
+                    { day: 'Monday', focus: 'Full Body Circuit', exercises: 'Squats, push-ups, planks, lunges | 3 rounds x 12 reps' },
+                    { day: 'Tuesday', focus: 'Cardio', exercises: 'Jogging, cycling, or brisk walking | 30 minutes' },
+                    { day: 'Wednesday', focus: 'Core Strength', exercises: 'Planks, Russian twists, bicycle crunches | 3 rounds' },
+                    { day: 'Thursday', focus: 'Upper Body', exercises: 'Push-ups, tricep dips, pike push-ups | 3 rounds x 12 reps' },
+                    { day: 'Friday', focus: 'Lower Body', exercises: 'Squats, lunges, glute bridges, calf raises | 3 rounds x 15 reps' },
+                    { day: 'Saturday', focus: 'Active Fun', exercises: 'Sports, hiking, swimming, or dancing | 45-60 minutes' },
+                    { day: 'Sunday', focus: 'Rest / Stretch', exercises: 'Yoga, stretching, meditation | 20-30 minutes' }
+                ],
+                'endurance': [
+                    { day: 'Monday', focus: 'Long Cardio', exercises: 'Brisk walking or jogging | 45-60 minutes' },
+                    { day: 'Tuesday', focus: 'Tempo Training', exercises: 'Interval running: 3 min fast, 2 min slow x 5 | 25 minutes' },
+                    { day: 'Wednesday', focus: 'Active Recovery', exercises: 'Light walk or gentle yoga | 30 minutes' },
+                    { day: 'Thursday', focus: 'HIIT Endurance', exercises: 'Burpees, squat jumps, mountain climbers, high knees | 4 rounds x 60 sec' },
+                    { day: 'Friday', focus: 'Steady State', exercises: 'Continuous moderate cardio | 40 minutes' },
+                    { day: 'Saturday', focus: 'Long Session', exercises: 'Extended jog, hike, or bike ride | 60-90 minutes' },
+                    { day: 'Sunday', focus: 'Rest / Stretch', exercises: 'Foam rolling, stretching | 20-30 minutes' }
+                ],
+                'flexibility': [
+                    { day: 'Monday', focus: 'Yoga Flow', exercises: 'Sun salutations, warrior poses, downward dog | 45 minutes' },
+                    { day: 'Tuesday', focus: 'Dynamic Stretching', exercises: 'Arm circles, leg swings, hip circles, torso twists | 20 minutes' },
+                    { day: 'Wednesday', focus: 'Pilates', exercises: 'Hundred, roll-ups, leg circles, spine stretch | 30 minutes' },
+                    { day: 'Thursday', focus: 'Static Stretching', exercises: 'Hamstring, hip flexor, shoulder, chest stretches | 30 minutes' },
+                    { day: 'Friday', focus: 'Yoga Flow', exercises: 'Balance poses, seated forward folds, twists | 45 minutes' },
+                    { day: 'Saturday', focus: 'Mobility Work', exercises: 'Joint circles, cat-cow, thoracic rotations, ankle mobility | 25 minutes' },
+                    { day: 'Sunday', focus: 'Rest / Meditation', exercises: 'Gentle stretching, breathing exercises | 20 minutes' }
+                ]
+            },
+            gym: {
+                'weight-loss': [
+                    { day: 'Monday', focus: 'Full Body Circuit', exercises: 'Treadmill intervals, lat pulldown, leg press, dumbbell press | 3 rounds' },
+                    { day: 'Tuesday', focus: 'Cardio', exercises: 'Stairmaster or elliptical | 35 minutes' },
+                    { day: 'Wednesday', focus: 'Strength Supersets', exercises: 'Bench press & rows, squats & lunges, planks | 3 rounds x 12 reps' },
+                    { day: 'Thursday', focus: 'HIIT', exercises: 'Battle ropes, box jumps, kettlebell swings, sled push | 4 rounds' },
+                    { day: 'Friday', focus: 'Core & Conditioning', exercises: 'Cable crunches, Russian twists, farmer carries, plank | 3 rounds' },
+                    { day: 'Saturday', focus: 'Cardio + Weights', exercises: '20 min run, then full body dumbbell circuit | 45 minutes total' },
+                    { day: 'Sunday', focus: 'Rest / Stretch', exercises: 'Foam rolling, stretching, sauna | 20-30 minutes' }
+                ],
+                'muscle-gain': [
+                    { day: 'Monday', focus: 'Chest & Triceps', exercises: 'Bench press, incline dumbbell press, cable flys, tricep pushdowns | 4 x 8-12' },
+                    { day: 'Tuesday', focus: 'Back & Biceps', exercises: 'Deadlifts, lat pulldowns, barbell rows, hammer curls | 4 x 8-12' },
+                    { day: 'Wednesday', focus: 'Active Recovery', exercises: 'Light cardio, stretching, abs | 30 minutes' },
+                    { day: 'Thursday', focus: 'Legs', exercises: 'Squats, leg press, Romanian deadlifts, leg extensions, calf raises | 4 x 10-15' },
+                    { day: 'Friday', focus: 'Shoulders & Arms', exercises: 'Overhead press, lateral raises, front raises, bicep curls, dips | 4 x 10-12' },
+                    { day: 'Saturday', focus: 'Weak Point Training', exercises: 'Target lagging muscle group with volume | 45 minutes' },
+                    { day: 'Sunday', focus: 'Rest', exercises: 'Complete rest or light stretching' }
+                ],
+                'maintenance': [
+                    { day: 'Monday', focus: 'Upper Body', exercises: 'Bench press, rows, shoulder press, lat pulldown | 3 x 10-12' },
+                    { day: 'Tuesday', focus: 'Lower Body', exercises: 'Squats, leg press, lunges, calf raises | 3 x 12-15' },
+                    { day: 'Wednesday', focus: 'Cardio', exercises: 'Treadmill, bike, or elliptical | 30 minutes' },
+                    { day: 'Thursday', focus: 'Push', exercises: 'Chest, shoulders, triceps | 3 x 10-12' },
+                    { day: 'Friday', focus: 'Pull', exercises: 'Back, biceps, rear delts | 3 x 10-12' },
+                    { day: 'Saturday', focus: 'Full Body', exercises: 'Compound movements, circuits | 40 minutes' },
+                    { day: 'Sunday', focus: 'Rest', exercises: 'Light activity or rest' }
+                ],
+                'endurance': [
+                    { day: 'Monday', focus: 'Long Run', exercises: 'Treadmill or track running | 45-60 minutes' },
+                    { day: 'Tuesday', focus: 'Cross Training', exercises: 'Rowing machine or swimming | 30 minutes' },
+                    { day: 'Wednesday', focus: 'Interval Training', exercises: 'Treadmill sprints: 1 min fast, 1 min slow x 10 | 20 minutes' },
+                    { day: 'Thursday', focus: 'Tempo Run', exercises: 'Steady pace run | 30-40 minutes' },
+                    { day: 'Friday', focus: 'Strength Endurance', exercises: 'High rep squats, lunges, step-ups, planks | 3 x 20' },
+                    { day: 'Saturday', focus: 'Long Session', exercises: 'Extended cardio session | 60-90 minutes' },
+                    { day: 'Sunday', focus: 'Recovery', exercises: 'Stretching, foam rolling, light walk | 30 minutes' }
+                ],
+                'flexibility': [
+                    { day: 'Monday', focus: 'Yoga Class', exercises: 'Gym yoga or guided stretching | 45-60 minutes' },
+                    { day: 'Tuesday', focus: 'Light Cardio + Stretch', exercises: '10 min bike, then full body stretch | 30 minutes' },
+                    { day: 'Wednesday', focus: 'Pilates', exercises: 'Reformer or mat Pilates | 45 minutes' },
+                    { day: 'Thursday', focus: 'Mobility', exercises: 'Dynamic stretches, foam rolling, band stretches | 30 minutes' },
+                    { day: 'Friday', focus: 'Yoga Flow', exercises: 'Vinyasa or hatha yoga | 45 minutes' },
+                    { day: 'Saturday', focus: 'Stretch Class', exercises: 'Guided stretching or PNF stretching | 30 minutes' },
+                    { day: 'Sunday', focus: 'Rest', exercises: 'Complete rest or gentle stretching' }
+                ]
+            },
+            none: {
+                'weight-loss': [
+                    { day: 'Monday', focus: 'Outdoor Cardio', exercises: 'Brisk walking, jogging, or cycling | 45 minutes' },
+                    { day: 'Tuesday', focus: 'Bodyweight HIIT', exercises: 'Burpees, jumping jacks, squats, push-ups | 3 rounds x 45 sec' },
+                    { day: 'Wednesday', focus: 'Active Recovery', exercises: 'Leisurely walk or light swim | 30 minutes' },
+                    { day: 'Thursday', focus: 'Hill/Reps', exercises: 'Stair climbing, hill walking, sprint intervals | 30 minutes' },
+                    { day: 'Friday', focus: 'Core Circuit', exercises: 'Planks, mountain climbers, leg raises, crunches | 3 rounds' },
+                    { day: 'Saturday', focus: 'Long Activity', exercises: 'Hiking, biking, or sports | 60+ minutes' },
+                    { day: 'Sunday', focus: 'Rest / Stretch', exercises: 'Stretching, yoga, meditation | 20-30 minutes' }
+                ],
+                'muscle-gain': [
+                    { day: 'Monday', focus: 'Upper Body', exercises: 'Push-ups, pull-ups (park), dips, handstand practice | 4 rounds' },
+                    { day: 'Tuesday', focus: 'Lower Body', exercises: 'Sprints, hill runs, pistol squat progressions, jumps | 4 rounds' },
+                    { day: 'Wednesday', focus: 'Active Recovery', exercises: 'Swimming or light jogging | 30 minutes' },
+                    { day: 'Thursday', focus: 'Full Body', exercises: 'Bear crawls, crab walks, pull-ups, push-up variations | 4 rounds' },
+                    { day: 'Friday', focus: 'Explosive Power', exercises: 'Box jumps (bench/park), broad jumps, clap push-ups | 4 rounds' },
+                    { day: 'Saturday', focus: 'Outdoor Strength', exercises: 'Park workout: pull-ups, dips, rows, hanging leg raises | 45 minutes' },
+                    { day: 'Sunday', focus: 'Rest', exercises: 'Complete rest or stretching' }
+                ],
+                'maintenance': [
+                    { day: 'Monday', focus: 'Jog/Walk', exercises: 'Outdoor jogging or brisk walking | 30 minutes' },
+                    { day: 'Tuesday', focus: 'Calisthenics', exercises: 'Push-ups, squats, lunges, planks at a park | 3 rounds' },
+                    { day: 'Wednesday', focus: 'Swimming / Cycling', exercises: 'Swim or bike ride | 30-45 minutes' },
+                    { day: 'Thursday', focus: 'Bodyweight Circuit', exercises: 'Burpees, jumping jacks, high knees, mountain climbers | 3 rounds' },
+                    { day: 'Friday', focus: 'Sports / Activity', exercises: 'Play a sport, hike, or long walk | 45 minutes' },
+                    { day: 'Saturday', focus: 'Active Outing', exercises: 'Hiking, beach walk, or outdoor yoga | 60 minutes' },
+                    { day: 'Sunday', focus: 'Rest', exercises: 'Light stretching or rest' }
+                ],
+                'endurance': [
+                    { day: 'Monday', focus: 'Long Run', exercises: 'Steady pace running | 45-60 minutes' },
+                    { day: 'Tuesday', focus: 'Intervals', exercises: 'Sprint 200m, jog 200m x 8-10 | 30 minutes' },
+                    { day: 'Wednesday', focus: 'Recovery', exercises: 'Easy jog or walk | 20-30 minutes' },
+                    { day: 'Thursday', focus: 'Tempo', exercises: 'Comfortably hard pace | 30-40 minutes' },
+                    { day: 'Friday', focus: 'Cross Training', exercises: 'Swimming or cycling | 30 minutes' },
+                    { day: 'Saturday', focus: 'Long Run', exercises: 'Extended run | 60-90 minutes' },
+                    { day: 'Sunday', focus: 'Rest', exercises: 'Stretching, massage, rest' }
+                ],
+                'flexibility': [
+                    { day: 'Monday', focus: 'Park Yoga', exercises: 'Outdoor yoga session | 45 minutes' },
+                    { day: 'Tuesday', focus: 'Dynamic Stretch', exercises: 'Full body dynamic stretches | 20 minutes' },
+                    { day: 'Wednesday', focus: 'Swim + Stretch', exercises: 'Easy swim, then stretch in water or after | 30 minutes' },
+                    { day: 'Thursday', focus: 'Static Stretching', exercises: 'Hold stretches 30-60 seconds each | 30 minutes' },
+                    { day: 'Friday', focus: 'Beach/Grass Yoga', exercises: 'Balance and flexibility poses | 45 minutes' },
+                    { day: 'Saturday', focus: 'Mobility Walk', exercises: 'Walk with frequent stretch breaks | 40 minutes' },
+                    { day: 'Sunday', focus: 'Rest', exercises: 'Gentle stretching or meditation | 20 minutes' }
+                ]
+            }
+        };
+
+        function renderWeekSelector() {
+            const container = document.getElementById('weekSelector');
+            container.innerHTML = '';
+            for (let i = 1; i <= 4; i++) {
+                const btn = document.createElement('button');
+                btn.className = `week-btn ${i === 1 ? 'active' : ''}`;
+                btn.textContent = `Week ${i}`;
+                btn.onclick = () => {
+                    document.querySelectorAll('.week-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderExercisePlan(i);
+                };
+                container.appendChild(btn);
+            }
+        }
+
+        function renderExercisePlan(week) {
+            const env = currentProfile.environment;
+            const goal = currentProfile.goal;
+            const plan = exercisePlans[env]?.[goal] || exercisePlans.home['weight-loss'];
+
+            // Adjust intensity based on week
+            const intensityMod = week === 1 ? ' (Foundation)' : week === 2 ? ' (Building)' : week === 3 ? ' (Progression)' : ' (Peak)';
+
+            let html = '<div class="table-responsive exercise-table"><table class="table mb-0"><thead><tr><th>Day</th><th>Focus</th><th>Exercises / Duration</th><th>Status</th></tr></thead><tbody>';
+            plan.forEach((dayPlan, idx) => {
+                const dayId = `w${week}d${idx}`;
+                const isDone = currentLogs.some(l => l.workoutDays && l.workoutDays.includes(dayId));
+                html += `
+                    <tr>
+                        <td><strong>${dayPlan.day}</strong></td>
+                        <td><span class="badge-exercise">${dayPlan.focus}${intensityMod}</span></td>
+                        <td>${dayPlan.exercises}</td>
+                        <td>
+                            <div class="workout-check ${isDone ? 'completed' : ''}" onclick="toggleWorkoutDay('${dayId}', this)">
+                                ${isDone ? '<i class="bi bi-check"></i>' : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            html += '</tbody></table></div>';
+            document.getElementById('exercisePlanContent').innerHTML = html;
+        }
+
+        function toggleWorkoutDay(dayId, el) {
+            const today = new Date().toISOString().split('T')[0];
+            let todayLog = currentLogs.find(l => l.date === today);
+            if (!todayLog) {
+                todayLog = { date: today, weight: '', calories: '', minutes: '', workout: false, diet: false, workoutDays: [] };
+                currentLogs.push(todayLog);
+            }
+            if (!todayLog.workoutDays) todayLog.workoutDays = [];
+
+            if (todayLog.workoutDays.includes(dayId)) {
+                todayLog.workoutDays = todayLog.workoutDays.filter(d => d !== dayId);
+                el.classList.remove('completed');
+                el.innerHTML = '';
+            } else {
+                todayLog.workoutDays.push(dayId);
+                el.classList.add('completed');
+                el.innerHTML = '<i class="bi bi-check"></i>';
+            }
+            saveLogs();
+            renderDashboard();
+        }
+
+        // ============================
+        // GOAL TRACKER
+        // ============================
+        function addLogEntry() {
+            const weight = parseFloat(document.getElementById('logWeight').value);
+            const calories = parseInt(document.getElementById('logCalories').value);
+            const minutes = parseInt(document.getElementById('logMinutes').value);
+            const workout = document.getElementById('workoutCompleted').checked;
+            const diet = document.getElementById('dietFollowed').checked;
+
+            if (!weight && !calories && !minutes) {
+                showTrackerMessage('Please enter at least one value.', 'warning');
+                return;
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+            const existingIdx = currentLogs.findIndex(l => l.date === today);
+
+            const entry = {
+                date: today,
+                weight: weight || (existingIdx >= 0 ? currentLogs[existingIdx].weight : ''),
+                calories: calories || '',
+                minutes: minutes || '',
+                workout: workout,
+                diet: diet,
+                workoutDays: existingIdx >= 0 ? (currentLogs[existingIdx].workoutDays || []) : []
+            };
+
+            if (existingIdx >= 0) {
+                currentLogs[existingIdx] = entry;
+            } else {
+                currentLogs.push(entry);
+            }
+
+            saveLogs();
+
+            // Clear inputs
+            document.getElementById('logWeight').value = '';
+            document.getElementById('logCalories').value = '';
+            document.getElementById('logMinutes').value = '';
+            document.getElementById('workoutCompleted').checked = false;
+            document.getElementById('dietFollowed').checked = false;
+
+            showTrackerMessage('Progress logged successfully! Keep it up!', 'success');
+            renderDashboard();
+        }
+
+        function showTrackerMessage(msg, type) {
+            const div = document.getElementById('trackerMessage');
+            div.className = `alert alert-${type} alert-custom mt-3`;
+            div.textContent = msg;
+            div.style.display = 'block';
+            setTimeout(() => { div.style.display = 'none'; }, 3000);
+        }
+
+        function renderLogHistory() {
+            const container = document.getElementById('logHistory');
+            if (currentLogs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-journal"></i>
+                        <p>No entries yet. Start logging your progress today!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const sorted = [...currentLogs].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
+            let html = '';
+            sorted.forEach(log => {
+                const details = [];
+                if (log.weight) details.push(`${log.weight} kg`);
+                if (log.calories) details.push(`${log.calories} kcal`);
+                if (log.minutes) details.push(`${log.minutes} min`);
+                if (log.workout) details.push('<i class="bi bi-check-circle-fill text-success"></i> Workout');
+                if (log.diet) details.push('<i class="bi bi-check-circle-fill text-success"></i> Diet');
+
+                html += `
+                    <div class="log-entry">
+                        <div>
+                            <div class="log-entry-date">${formatDate(log.date)}</div>
+                            <div class="log-entry-details">${details.length > 0 ? details.join(' &bull; ') : 'No details logged'}</div>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteLog('${log.date}')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function formatDate(dateStr) {
+            const d = new Date(dateStr + 'T00:00:00');
+            return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        }
+
+        function deleteLog(date) {
+            if (confirm('Delete this log entry?')) {
+                currentLogs = currentLogs.filter(l => l.date !== date);
+                saveLogs();
+                renderDashboard();
+            }
+        }
+
+        // ============================
+        // INIT
+        // ============================
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+        });
+    </script>
+</body>
+</html>
